@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/assets/dist/css/bootstrap.min.css">
+  <title>Inicio Sessión</title>
+</head>
+<body>
+  <main class="container my-5" style="max-width: 500px">
+    <h1 class="mt-5 mb-5 text-center">Inicio de Sesión</h1>
+
+    <form class="row g-3" th:action="@{/validate}" th:object="${user}" method="post">
+
+
+
+      <div class="col-md-12 mb-2">
+        <label for="username" class="">Usuario:</label>
+        <input type="text" class="form-control border-2" id="username" th:field="*{username}" placeholder="tu-gatita.." required>
+      </div>
+  
+      <div class="col-md-12 mb-2">
+        <label for="password" class="">Contraseña:</label>
+        <input type="password" class="form-control border-2" th:field="*{password}" id="password" placeholder="*****.." required>
+      </div>
+  
+      <div class="d-grid gap-2 text-center">
+        <p>¿No tenes cuenta? <a href="/register">create una!</a></p>
+      </div>
+  
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary">Iniciar session</button>
+      </div>
+      <p class="mt-5 mb-3 text-muted text-center">&copy; 22022 trying to live</p>
+    </form>
+  </main>
+
+  <script src="/assets/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
