@@ -4,11 +4,11 @@
 
 Este proyecto es un ejemplo de como implementar el nuevo Spring Security, utilizando la autenticación por formulario usando Thymeleaf.
 
-Solo esta basado en como procesar las sesiones.
+Solo está basado en como procesar las sesiones.
 
 ### Armando el proyecto
 
-Para crear el proyecto se utilizó la pagina de Spring Initializr, con las siguientes dependencias:
+Para crear el proyecto se utilizó la página de Spring Initializer, con las siguientes dependencias:
 
 La version de java de este proyecto es la 17.
 
@@ -17,7 +17,7 @@ La version de java de este proyecto es la 17.
 * **Spring Data JPA** -> Para la persistencia de datos
 * **Thymeleaf** -> Para la creación de las vistas
 * **MySQL Driver** -> Para la conexión con la base de datos
-* **Spring Boot DevTools** -> para que se actualice automaticamente el proyecto al guardar los cambios
+* **Spring Boot DevTools** -> para que se actualice automáticamente el proyecto al guardar los cambios
 
 ### Configuración de la base de datos
 
@@ -37,7 +37,7 @@ spring.jpa.show-sql=false # Si quieres que se muestren las consultas SQL lo prue
 
 ## Configuración de Spring Security
 
-Anteriormente la configuracion de Spring Security se creaba una clase que heredaba de **WebSecurityConfigurerAdapter** en el que se tenian que sobreescribir algunos metodos.
+Anteriormente, la configuration de Spring Security se creaba una clase que heredaba de **WebSecurityConfigurerAdapter** en el que se tenía que sobreescribir algunos metódos.
 
 ejemplo:
 
@@ -52,11 +52,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-Ahora en la version de Spring Security 5.7.0-M2 la clase **WebSecurityConfigurerAdapter** fue deprecada por lo tanto la nueva configuracion seria esta.
+Ahora en la version de Spring Security 5.7.0-M2 la clase **WebSecurityConfigurerAdapter** fue deprecada, por lo tanto, la nueva configuración sería esta.
 
 ```java
-
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -64,43 +64,44 @@ public class SecurityConfig {
         // Rutas donde el usuario puede acceder y otras que no
     http
       .authorizeRequests(
-          authorizeRequests -> authorizeRequests
-              .antMatchers("/login", "/register", "/users").permitAll() // El usuario puede acceder al formulario de login
+        authorizeRequests -> authorizeRequests
+          .antMatchers("/login", "/register", "/users").permitAll() // El usuario puede acceder al formulario de login
 
-              .antMatchers("/assets/**").permitAll() // Para que se puedan aplicar los estilos de bootstrap 
+          .antMatchers("/assets/**").permitAll() // Para que se puedan aplicar los estilos de bootstrap 
 
-              .anyRequest().authenticated() // Cualquier otra ruta que tengamos el usuario tiene que estar autenticado
-
+          .anyRequest().authenticated() // Cualquier otra ruta que tengamos el usuario tiene que estar autenticado
     );
 
-    // Configuracion del login
+    // Configuración del login
     http.formLogin(
       formLogin -> formLogin
           .loginPage("/login") // Ruta de nuestro formulario custom de login (opcional) por defecto spring tiene su propio formulario de login
     );
 
 
-    // Configuracion del logout
+    // Configuración del logout
     http.logout(
       logout -> logout
-          .deleteCookies("JSESSIONID") // Borra la cookie de sesion
+          .deleteCookies("JSESSIONID", "jwt") // Borra la cookie de sesión
           .logoutSuccessUrl("/login") // Url a la que se redirige en caso de exito
-          .permitAll() // Permitir acceso a la pagina de logout a cualquiera
+          .permitAll() // Permitir acceso a la página de logout a cualquiera
     );
 
+    // Configuración de CSRF
+    http.csrf().disable();
+
     return http.build();
+    }
 }
 ````
 
-por ahora la configuracion que se esta utilizando es la que vamos a usar para este proyecto, aunque vamos agregar mas.
-igual lo voy a explicar para que se entienda lo que vamos agregando.
-
+Por ahora la configuración que se está utilizando es la que vamos a usar para este proyecto, aunque vamos a agregar más.
 
 ## Creando un modelo de Usuario
 
 ```java
 @Entity
-@Table(name = "users") // Nombre que tendra la tabla en la base de datos
+@Table(name = "users") // Nombre que tendrá la tabla en la base de datos
 public class AppUser {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -143,7 +144,7 @@ public class AppUser {
 }
 ```
 
-El modelo nos servira para poder mapear los usuarios en la base de datos y tambien **hibernate** nos creara la tabla con sus propiedades.
+El modelo nos servirá para poder mapear los usuarios en la base de datos y también **hibernate** nos creará la tabla con sus propiedades.
 
 ## Repositorio de Usuario
 
@@ -155,9 +156,9 @@ public interface UserRepository extends JpaRepository<AppUser, Long>{
 }
 ```
 
-La interface **UserRepository** es el que nos ayudara con la persistencia de los datos que recibamos del cliente.
+La interfaz **UserRepository** es el que nos ayudara con la persistencia de los datos que recibamos del cliente.
 
-## Paginas de HTML para el login y el registro de los usuarios
+## Páginas de HTML para el login y el registro de los usuarios
 
 **Formulario de Login**
 
@@ -169,7 +170,7 @@ La interface **UserRepository** es el que nos ayudara con la persistencia de los
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/assets/dist/css/bootstrap.min.css">
-  <title>Inicio Sessión</title>
+  <title>Inicio Session</title>
 </head>
 <body>
   <main class="container my-5" style="max-width: 500px">
@@ -190,7 +191,7 @@ La interface **UserRepository** es el que nos ayudara con la persistencia de los
       </div>
   
       <div class="d-grid gap-2 text-center">
-        <p>¿No tenes cuenta? <a href="/register">create una!</a></p>
+        <p>¿No tienes cuenta? <a href="/register">create una!</a></p>
       </div>
   
       <div class="d-grid gap-2">
@@ -205,7 +206,7 @@ La interface **UserRepository** es el que nos ayudara con la persistencia de los
 </html>
 ```
 
-**Formulario de Resgistro**
+**Formulario de Registro**
 
 ```html
 <!DOCTYPE html>
@@ -219,7 +220,7 @@ La interface **UserRepository** es el que nos ayudara con la persistencia de los
 </head>
 <body>
   <main class="container my-5" style="max-width: 500px">
-    <h1 class="mt-5 mb-5 text-center">Creacion de Usuario</h1>
+    <h1 class="mt-5 mb-5 text-center">Creación de Usuario</h1>
 
     <form class="row g-3" th:action="@{/register}" th:object="${user}" method="post">
 
@@ -253,9 +254,9 @@ La interface **UserRepository** es el que nos ayudara con la persistencia de los
 </html>
 ```
 
-Los formulario de **HTML** estan adaptadas para que thymeleaf las pueda usar.
+El formulario de **HTML** están adaptadas para que thymeleaf las pueda usar.
 
-Los estilos de Bootstrap estan en la carpera **static** si los queres aplicar a tu propio proyecto, tambien puedes usar un **cdn**
+Los estilos de Bootstrap están en la carpeta **static** si los quieres aplicar a tu propio proyecto, también puedes usar un **cdn**
 
 ## Creación de los Servicios del Usuario
 
@@ -266,7 +267,7 @@ public class UserService implements UserDetailsService{
   @Autowired
   UserRepository userRepository;
 
-  PasswordEncoder passwordEncoder;
+  BCryptPasswordEncoder passwordEncoder;
 
   // Carga al usuario por su nombre de usuario
   @Override
@@ -279,7 +280,7 @@ public class UserService implements UserDetailsService{
     return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
   }
 
-  // Valida si el ususario existe -> lo usaremos cuando un usuario se esté registrando
+  // Válida si el usuario existe -> lo usaremos cuando un usuario se esté registrando
   public Boolean validateUsername (String username){
     return userRepository.existsByUsername(username);
   }
@@ -291,7 +292,7 @@ public class UserService implements UserDetailsService{
 }
 ```
 
-la clase **UserService** imlementa la interfaz **UserDetailsService** el cual tenemos que implementar el metodo **loadUserByUsername** que recibe por parametro el **usuario**, lo que hay dentro del metodo es la logica basica para cargar un usuario.
+La clase **UserService** implementa la interfaz **UserDetailsService** el cual tenemos que implementar el método **loadUserByUsername** que recibe por parámetro el **usuario**, lo que hay dentro del método es la lógica básica para cargar un usuario.
 
 
 ## Antes de Crear los Controladores
@@ -300,6 +301,7 @@ Antes de crear los controladores hay que agregar algunas modificaciones en la cl
 
 ```java
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
   @Autowired
@@ -310,16 +312,16 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // Solo tienes que agregar a lo que ya se configuró.
     
-    // Configuracion de CSRF -> Esta desactivado ya que no se esta usando en los formulario, pero si quieres lo puedes usar; pero tiene que modificar el formulario HTML
+    // Configuración de CSRF -> Está desactivado, ya que no se está usando en el formulario, pero si quieres lo puedes usar; pero tiene que modificar el formulario HTML
     http.csrf().disable();
     
     // EL proveedor que implementamos abajo
-    http.authenticationProvider(authenticationProvider()); // Configuracion del proveedor de autenticacion
+    http.authenticationProvider(authenticationProvider()); // Configuración del proveedor de autenticación
 
     return http.build();
   }
 
-  // Configuracion del proveedor de autenticacion
+  // Configuración del proveedor de autenticación
   @Bean
   public DaoAuthenticationProvider authenticationProvider() throws Exception {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -328,24 +330,23 @@ public class SecurityConfig {
     return provider;
   }
 
-    // Codificador de contraseñas ya que spring nos obliga a encodear los passwords 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder(); // Clase que Hashea el password
-    }
+  // Configuración del AuthenticationManager -> procesa una petición de autenticación de una Request
+  @Bean
+  public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
+  return configuration.getAuthenticationManager();
+  }
 
-    // Configuracion del AuthenticationManager -> procesa una peticion de Autenticacion de una Request
-    @Bean
-    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
-    return configuration.getAuthenticationManager();
-    }
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+      return new BCryptPasswordEncoder();
+  }
 }
 ```
-**SpringSecurity** maneja por si solo la autenticacion cuando aplicamos esta configuracion; solo que le estamos pasando las clases que queremos que utlize **spring** para autenticar un usuario.
+**SpringSecurity** maneja por si solo la autenticación cuando aplicamos esta configuración; solo que le estamos pasando las clases que queremos que utilize **spring** para autenticar un usuario.
 
-La configuracion de ahora **spring** guarda en memoria los usuario que estan autenticados y les da acceso a las rutas que solo pueden acceder los usuarios autenticados
+La configuración de ahora **spring** guarda en memoria el usuario que están autenticados y les da acceso a esas rutas.
 
-La Implementacion de **JSON web Token** se implementara mas adelante por no queremos guardar en memoria los usuarios autenticados
+La autenticación con **JSON web Token** se implementará más adelante, si no quires guardar en memoria los usuarios que están autenticados.
 
 
 ## Creando los Controladores
@@ -354,8 +355,11 @@ La Implementacion de **JSON web Token** se implementara mas adelante por no quer
 @Controller
 public class UserController {
   
-  @Autowired // Injecta la clase directamente en el atributo, de otra manera hay que crear su contructor al UserController pasando por parametro los atributos declarados
+  @Autowired // Agrega la clase directamente en el atributo, de otra manera hay que crear su constructor al UserController pasando por parámetro los atributos declarados
   UserRepository userRepository;
+
+  @Autowired
+  BCryptPasswordEncoder passwordEncoder;
     
   @Autowired
   UserService userService;
@@ -385,35 +389,14 @@ public class UserController {
 
   @PostMapping("/register")
   public String postRegister(@ModelAttribute AppUser user, Model model, HttpServletResponse response) {
-    boolean userExists = userService.validateUsername(user.getUsername());
-    if(userExists) {
-      model.addAttribute("user", user);
-      return "register";
+    boolean userExist = userRepository.existsByUsername(user.getUsername());
+    if (userExist) {
+      return "redirect:/register";
     }
-    user.setPassword(userService.encodePassword(user.getPassword()));
-    userRepository.save(user);
+    String encoded = passwordEncoder.encode(user.getPassword());
+    AppUser newUser = new AppUser(null, user.getUsername(), encoded);
+    userRepository.save(newUser);
     return "redirect:/users";
   }
-```
-
-Por ahora si corres esta aplicacion deberia funcionar, El tipo de autenticacion es la de guardar el usuario en memoria y se le pasa una **cookie** con la clave **JSESSIONID** con su valor. Esto lo hace spring automaticamente por defecto si el usuario existe en la base de datos
-
-Para agregar un **usuario** usa la ruta **/register** para guardarlo en la base de datos, luego intenta autenticarte
-
-
-## Usando JWT(JSON Web Token)
-
-Si queremos usar **JWT** para validar los usuario que estan autenticados tenemos que crear algunas clases y agregar una dependencia al **pom.xml**.
-
-Tambien vamos a agregar solo una linea de codigo a la clase **SecurityConfig** especialmente a su metodo **SecurityFilterChain**
-
-**Dependencia para agregar al pom.xml**
-
-```xml
-<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt</artifactId>
-    <version>0.9.1</version>
-</dependency>
+}
 ```

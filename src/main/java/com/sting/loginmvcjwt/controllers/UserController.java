@@ -1,11 +1,7 @@
 package com.sting.loginmvcjwt.controllers;
 
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,21 +10,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.sting.loginmvcjwt.models.AppUser;
 import com.sting.loginmvcjwt.repository.UserRepository;
-import com.sting.loginmvcjwt.service.JwtService;
 import com.sting.loginmvcjwt.service.UserService;
-
 
 @Controller
 public class UserController {
-  
+
   @Autowired
   UserRepository userRepository;
 
   @Autowired
-  UserService userService;
-  
+  BCryptPasswordEncoder passwordEncoder;
+
   @Autowired
-  JwtService jwtService;
+  UserService userService;
 
   @GetMapping("/")
   public String getHello() {
@@ -40,50 +34,34 @@ public class UserController {
     AppUser user = new AppUser();
 
     model.addAttribute("user", user);
-  
+
     return "login";
   }
-
-  @PostMapping("/validate")
-  public String validate(@ModelAttribute AppUser user, HttpServletResponse response) {
-    // Optional<AppUser> userFound = userRepository.findByUsername(user.getUsername());
-
-    UserDetails userFound = userService.loadUserByUsername(user.getUsername());
-
-    System.out.println(user.getUsername() + " " + user.getPassword());
-
-    if(userFound == null){
-      return "redirect:/login";
-    }
-
-    if(userService.validatePassword(user.getPassword(), userFound)){
-      Cookie cookie = new Cookie("jwt", String.format("Bearer ", jwtService.createToken(userFound)));
-      response.addCookie(cookie);
-      return "redirect:/";
-    }
-
-    return "redirect:/login";
-  }
-
 
   @GetMapping("/register")
   public String getRegister(Model model) {
     AppUser user = new AppUser();
 
     model.addAttribute("user", user);
-  
+
     return "register";
   }
 
   @PostMapping("/register")
-  public String postRegister(@ModelAttribute AppUser user, Model model, HttpServletResponse response) {
-    boolean userExists = userService.validateUsername(user.getUsername());
-    if(userExists) {
-      model.addAttribute("user", user);
-      return "register";
+  public String postRegister(@ModelAttribute AppUser user, Model model) {
+    boolean userExist = userRepository.existsByUsername(user.getUsername());
+    if (userExist) {
+      return "redirect:/register";
     }
-    user.setPassword(userService.encodePassword(user.getPassword()));
-    userRepository.save(user);
+    String encoded = passwordEncoder.encode(user.getPassword());
+    AppUser newUser = new AppUser(null, user.getUsername(), encoded);
+    userRepository.save(newUser);
     return "redirect:/users";
   }
+
+  @GetMapping("/private")
+  public String privado() {
+    return "privado";
+  }
+
 }

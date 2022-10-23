@@ -9,14 +9,9 @@
 </head>
 <body>
   <main class="container my-5" style="max-width: 500px">
-    <h1 class="mt-5 mb-5 text-center">Creacion de Usuario</h1>
+    <h1 class="mt-5 mb-5 text-center">Creación de Usuario</h1>
 
     <form class="row g-3" th:action="@{/register}" th:object="${user}" method="post">
-
-      <p th:if="${error}">
-        <span th:text="${error}"></span>
-      </p>
-
       <div class="col-md-12 mb-2">
         <label for="username" class="">Elija Usuario:</label>
         <input type="text" class="form-control border-2" id="username" th:field="*{username}" placeholder="tu-gatita.." required>
@@ -28,7 +23,7 @@
       </div>
   
       <div class="d-grid gap-2 text-center">
-        <p>¿Ya tenes una cuenta? <a href="/login">Entrá!</a></p>
+        <p>¿Ya tienes una cuenta? <a href="/login">Entrá!</a></p>
       </div>
   
       <div class="d-grid gap-2">

@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sting.loginmvcjwt.models.AppUser;
@@ -19,7 +19,7 @@ public class UserService implements UserDetailsService{
   @Autowired
   UserRepository userRepository;
 
-  PasswordEncoder passwordEncoder;
+  BCryptPasswordEncoder passwordEncoder;
 
   // Carga al usuario por su nombre de usuario
   @Override
@@ -32,12 +32,12 @@ public class UserService implements UserDetailsService{
     return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
   }
 
-  // Valida si el ususario existe
+  // Valida si el usuario existe
   public boolean validateUsername (String username){
     return userRepository.existsByUsername(username);
   }
 
-  // Valida si el password es correcto
+  // Válida si el password es correcto
   public boolean validatePassword(String password, UserDetails user){
     return passwordEncoder.matches(password, user.getPassword());
   }
@@ -45,5 +45,10 @@ public class UserService implements UserDetailsService{
   // Crea un nuevo hash de password
   public String encodePassword(String password){
     return passwordEncoder.encode(password);
+  }
+
+  public void saveUser(AppUser user){
+    user.setPassword(encodePassword(user.getPassword()));
+    userRepository.save(user);
   }
 }
