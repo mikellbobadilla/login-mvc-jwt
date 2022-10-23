@@ -400,3 +400,27 @@ public class UserController {
   }
 }
 ```
+
+**Para ver la configuracion de autenticación con JWT tienes que usar la rama jwt**
+
+Por ahora si corres esta aplicación debería funcionar, El tipo de autenticación es la de guardar el usuario en memoria y se le pasa una **cookie** con la clave **JSESSIONID** con su valor. Esto lo hace spring automáticamente por defecto si el usuario existe en la base de datos
+
+Para agregar un **usuario** usa la ruta **/register** para guardarlo en la base de datos, luego intenta autenticarte
+
+
+## Usando JWT(JSON Web Token)
+
+Si queremos usar **JWT** para validar el usuario que están autenticados tenemos que crear algunas clases y agregar una dependencia al **pom.xml**.
+
+También vamos a agregar solo una línea de código a la clase **SecurityConfig** especialmente a su método **SecurityFilterChain**
+
+**Dependencia para agregar al pom.xml**
+
+```xml
+<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.9.1</version>
+</dependency>
+```
