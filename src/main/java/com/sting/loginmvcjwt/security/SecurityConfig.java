@@ -8,9 +8,12 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.sting.loginmvcjwt.filter.JwtRequestFilter;
 import com.sting.loginmvcjwt.service.UserService;
 
 @Configuration
@@ -20,9 +23,17 @@ public class SecurityConfig {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    AuthenticationConfiguration authenticationConfiguration;
+
+    // @Autowired
+    // CustomAuthenticationFilter customAuthenticationFilter;
+
     // Configuración de seguridad para la aplicación
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        
+
         // Url donde el usuario puede acceder sin estar registrado
         http
         .authorizeRequests(
@@ -48,7 +59,10 @@ public class SecurityConfig {
                 .permitAll() // Permitir acceso a la página de logout a cualquiera
         );
 
-        // http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // http.addFilter(customAuthenticationFilter);
+        http.addFilterBefore(jwtRequestFilter(),  UsernamePasswordAuthenticationFilter.class);
+
         // // No crear sesión
         // Configuración de CSRF
         http.csrf().disable();
@@ -77,4 +91,10 @@ public class SecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
+    @Bean
+    public JwtRequestFilter jwtRequestFilter(){
+        return new JwtRequestFilter();
+    }
+
 }

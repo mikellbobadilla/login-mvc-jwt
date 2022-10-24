@@ -417,10 +417,10 @@ También vamos a agregar solo una línea de código a la clase **SecurityConfig*
 **Dependencia para agregar al pom.xml**
 
 ```xml
-<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt</artifactId>
-    <version>0.9.1</version>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.11.5</version>
 </dependency>
 ```
